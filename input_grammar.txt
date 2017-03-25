@@ -1,0 +1,30 @@
+<assignment_input>          ::= <lex.test_data> <lex.colon> <assignment_body> ;
+<assignment_body>           ::= <section_1> <section_2> ;
+
+<section_1>                 ::= <lex.integer> <lex.close_paren> <lex.section_1_statement> [<lex.semicolon>] <section_1_body> ;
+<section_1_body>            ::= (<section_1_body_statement>)+ ;
+<section_1_body_statement>  ::= <lex.char> <lex.period> <table_statement> ;
+<section_2>                 ::= <lex.integer> <lex.close_paren> <lex.section_2_statement> [<lex.semicolon>] <section_2_body> ;
+<section_2_body>            ::= (<section_2_body_statement>)+ ;
+<section_2_body_statement>  ::= <lex.char> <lex.period> <query_statement> ;
+
+<table_statement>           ::= <lex.identifier> <lex.open_paren> <table_attribute_list>  <lex.close_paren> ;
+<table_attribute_list>      ::= <table_attribute> {<lex.comma> <table_attribute>} ;
+<table_attribute>           ::= <lex.identifier> <lex.colon> <lex.sql_type> ;
+
+<query_statement>           ::= <query_statement_inner> [<lex.semicolon>] ;
+<query_statement_inner>     ::= <lex.open_paren> <query_statement_inner> <lex.close_paren> | <query_statement_core> ;
+<query_statement_core>      ::= <query_select> <query_from> <query_where> ;
+<query_select>              ::= <lex.sql_select> <sql_attribute_list> ;
+<query_from>                ::= <lex.sql_from> <sql_table_list> ;
+<query_where>               ::= <lex.sql_where> <sql_expression> ;
+
+<sql_attribute_list>        ::= <sql_attribute> {<lex.comma> <sql_attribute>} ;
+<sql_attribute>             ::= [<lex.identifier> <lex.period>] <lex.identifier> ;
+<sql_table_list>            ::= <sql_table> {<lex.comma> <sql_table>} ;
+<sql_table>                 ::= <lex.identifer> [<lex.sql_as> <lex.identifier>] ;
+<sql_expression>            ::= <sql_expr_simpl> | <sql_expression> <sql_expr_op> <sql_expression> ;
+<sql_expr_simpl>            ::= <sql_attribute> <sql_bool_comp> <sql_attribute> ;
+<sql_expr_op>               ::= <lex.expr_op> ;
+<sql_bool_comp>             ::= <lex.bool_comp> ;
+
