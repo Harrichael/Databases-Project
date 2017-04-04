@@ -1,0 +1,12 @@
+Sailors(sid:integer, sname:string, rating:integer, age:real)
+Boats(bid:integer, bname:string, color:string)
+Reserves(sid:integer, bid:integer, day:date)
+
+SELECT      S.sname
+FROM        Sailors as S,  Reserves AS R
+WHERE       S.sid=R.sid AND R.bid=103
+GROUP BY    R.bid
+
+SELECT      S.sname, bid
+FROM        Sailors,  Reserves 
+WHERE       S.sid=R.sid AND R.bid=103
