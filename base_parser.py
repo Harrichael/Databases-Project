@@ -56,16 +56,20 @@ class Parser(object):
         return tryDecorator
 
     def parse_Terminal(self, terminal):
+        token = self.token
         if self.token == terminal:
             self.getToken()
         else:
             raise ParserException('Terminal not found: ' + terminal)
+        return token
 
     def parse_Keyword(self, keyword):
+        token = self.token.upper()
         if self.token.upper() == keyword.upper():
             self.getToken()
         else:
             raise ParserException('Keyword not found: ' + keyword)
+        return token
 
     def parse_Token(self):
         self.getToken()

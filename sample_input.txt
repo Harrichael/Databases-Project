@@ -4,6 +4,9 @@ Reserves(sid:integer, bid:integer, day:date)
 
 SELECT      S.sname
 FROM        Sailors as S,  Reserves AS R
+
+SELECT      S.sname
+FROM        Sailors as S,  Reserves AS R
 WHERE       S.sid=R.sid AND R.bid=103
 GROUP BY    R.bid
 

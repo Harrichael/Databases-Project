@@ -19,6 +19,9 @@ from sql_ast import ( AST_TableDecl,
                       AST_Attribute,
                       AST_From,
                       AST_FromTable,
+                      AST_Where,
+                      AST_BoolExpr,
+                      AST_GroupBy,
                     )
 
 def parse_sql(inputStr):
@@ -110,10 +113,16 @@ class SqlParser(Parser):
 
         ast_qselect = self.parse_SqlQuerySelect()
         ast_qfrom = self.parse_SqlQueryFrom()
-        ast_qwhere = self.try_SqlQueryWhere()
-        ast_qgb = self.try_SqlQueryGroupBy()
+        ast_query = AST_SqlQuery(ast_qselect, ast_qfrom)
 
-        ast_query = AST_SqlQuery(ast_qselect, ast_qfrom, ast_qwhere, ast_qgb)
+        success, ast_qwhere = self.try_SqlQueryWhere()
+        if success:
+            ast_query.setWhere(ast_qwhere)
+            
+        success, ast_qgb = self.try_SqlQueryGroupBy()
+        if success:
+            ast_query.setGroupBy(ast_qgb)
+
         return ast_query
 
     def parse_SqlQuerySelect(self):
@@ -154,16 +163,23 @@ class SqlParser(Parser):
 
     def parse_SqlQueryWhere(self):
         success = True
+        ast_where = AST_Where()
+        ast_bc = None
 
         self.parse_Keyword('WHERE')
         while success:
             ast_boolClause = self.parse_BoolClause()
-            success, _ = self.try_BoolChain()
+            ast_where.addBoolExpr(ast_boolClause, ast_bc)
+            success, ast_bc = self.try_BoolChain()
+
+        return ast_where
 
     def parse_BoolClause(self):
-        self.parse_BoolTerm()
-        self.parse_BoolComp()
-        self.parse_BoolTerm()
+        lhs = self.parse_BoolTerm()
+        comp = self.parse_BoolComp()
+        rhs = self.parse_BoolTerm()
+
+        return AST_BoolExpr(lhs, comp, rhs)
 
     def parse_BoolTerm(self):
         success, ast_bt = self.try_Attribute()
@@ -201,7 +217,9 @@ class SqlParser(Parser):
     def parse_SqlQueryGroupBy(self):
         self.parse_Keyword('GROUP')
         self.parse_Keyword('BY')
-        self.parse_Attribute()
+        ast_attr = self.parse_Attribute()
+
+        return AST_GroupBy(ast_attr)
 
     def parse_TableStatements(self):
         ast_tables = AST_TableDecls()

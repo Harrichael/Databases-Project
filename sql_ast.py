@@ -56,10 +56,16 @@ class AST_SqlQueries(AST_Node):
         return '\n\n'.join(map(str, self.queries))
 
 class AST_SqlQuery(AST_Node):
-    def __init__(self, qselect, qfrom, qwhere, qgb):
+    def __init__(self, qselect, qfrom):
         self.qselect = qselect
         self.qfrom = qfrom
+        self.qwhere = None
+        self.qgb = None
+
+    def setWhere(self, qwhere):
         self.qwhere = qwhere
+
+    def setGroupBy(self, qgb):
         self.qgb = qgb
 
     def __str__(self):
@@ -108,4 +114,39 @@ class AST_FromTable(AST_Node):
 
     def __str__(self):
         return self.alias + '-' + self.name
+
+class AST_Where(AST_Node):
+    def __init__(self):
+        self.boolExprs = []
+        self.boolComps = []
+
+    def addBoolExpr(self, ast_be, ast_bc):
+        self.boolExprs.append(ast_be)
+        self.boolComps.append(ast_bc)
+
+    @property
+    def boolEC(self):
+        for e, c in zip(self.boolExprs, self.boolComps[1:] + [None]):
+            yield e
+            if c:
+                yield c
+
+    def __str__(self):
+        return 'WHERE ' + ' '.join(map(str, self.boolEC))
+
+class AST_BoolExpr(AST_Node):
+    def __init__(self, lhs, comp, rhs):
+        self.lhs = lhs
+        self.comp = comp
+        self.rhs = rhs
+
+    def __str__(self):
+        return ' '.join(map(str, [self.lhs, self.comp, self.rhs]))
+
+class AST_GroupBy(AST_Node):
+    def __init__(self, attribute):
+        self.attribute = attribute
+
+    def __str__(self):
+        return 'GROUP BY ' + str(self.attribute)
 
