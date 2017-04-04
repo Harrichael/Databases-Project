@@ -14,7 +14,11 @@ from sql_ast import ( AST_TableDecl,
                       AST_TableDecls,
                       AST_SQL,
                       AST_SqlQueries,
-                      AST_SqlQuery
+                      AST_SqlQuery,
+                      AST_Select,
+                      AST_Attribute,
+                      AST_From,
+                      AST_FromTable,
                     )
 
 def parse_sql(inputStr):
@@ -64,7 +68,7 @@ class SqlParser(Parser):
             self.getToken()
         else:
             raise ParserException('Attribute')
-        return token
+        return AST_Attribute(token)
 
     def parse_Value(self):
         token = self.token
@@ -103,38 +107,50 @@ class SqlParser(Parser):
         return ast_queries
 
     def parse_SqlQuery(self):
-        ast_query = AST_SqlQuery()
 
-        self.parse_SqlQuerySelect()
-        self.parse_SqlQueryFrom()
-        self.try_SqlQueryWhere()
-        self.try_SqlQueryGroupBy()
+        ast_qselect = self.parse_SqlQuerySelect()
+        ast_qfrom = self.parse_SqlQueryFrom()
+        ast_qwhere = self.try_SqlQueryWhere()
+        ast_qgb = self.try_SqlQueryGroupBy()
 
+        ast_query = AST_SqlQuery(ast_qselect, ast_qfrom, ast_qwhere, ast_qgb)
         return ast_query
 
     def parse_SqlQuerySelect(self):
         success = True
+        ast_select = AST_Select()
 
         self.parse_Keyword('SELECT')
         while success:
             ast_selector = self.parse_QSelector()
+            ast_select.addSelector(ast_selector)
             success, _ = self.try_Terminal(',')
 
+        return ast_select
+
     def parse_QSelector(self):
-        self.parse_Attribute()
+        return self.parse_Attribute()
 
     def parse_SqlQueryFrom(self):
         success = True
+        ast_from = AST_From()
 
         self.parse_Keyword('FROM')
         while success:
             ast_fromTable = self.parse_FromTable()
+            ast_from.addTable(ast_fromTable)
             success, _ = self.try_Terminal(',')
 
+        return ast_from
+
     def parse_FromTable(self):
-        self.parse_Identifier()
+        tableName = self.parse_Identifier()
+        ast_fromTable = AST_FromTable(tableName)
         if self.try_Keyword('AS')[0]:
-            self.parse_Identifier()
+            alias = self.parse_Identifier()
+            ast_fromTable.setAlias(alias)
+
+        return ast_fromTable
 
     def parse_SqlQueryWhere(self):
         success = True
