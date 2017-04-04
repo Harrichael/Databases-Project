@@ -13,3 +13,9 @@ GROUP BY    R.bid
 SELECT      S.sname, bid
 FROM        Sailors,  Reserves 
 WHERE       S.sid=R.sid AND R.bid=103
+
+SELECT      S.sname
+FROM        Sailors as S,  Reserves AS R
+INTERSECT
+SELECT      S.sid
+FROM        Sailors as S

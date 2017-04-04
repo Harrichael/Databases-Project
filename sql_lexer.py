@@ -23,6 +23,19 @@ class Lexer(object):
         'AS',
         'OR',
         'AND',
+        'INTERSECT',
+        'UNION',
+        'EXCEPT',
+        'ADD',
+
+        'HAVING',
+        'CONTAINS',
+        'IN',
+        'EXISTS',
+        'MAX',
+        'MIN',
+        'COUNT',
+        'AVG',
     ])
     sentinelToken   = ''
 

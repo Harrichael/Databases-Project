@@ -22,6 +22,7 @@ from sql_ast import ( AST_TableDecl,
                       AST_Where,
                       AST_BoolExpr,
                       AST_GroupBy,
+                      AST_QCommand,
                     )
 
 def parse_sql(inputStr):
@@ -37,15 +38,14 @@ class SqlParser(Parser):
         super(self.__class__, self).parse()
 
         success = True
+        ast = None
         try:
             ast = self.parse_StartSymbol()
             self.parse_EndSymbol()
         except ParserException:
             success = False
 
-        if success:
-            print(ast)
-        return success
+        return ast
 
     """
     Parse methods for lexer
@@ -94,23 +94,45 @@ class SqlParser(Parser):
 
     def parse_sqlInput(self):
         ast_tableDecls = self.parse_TableStatements()
-        ast_queries = self.parse_SqlQueries()
+        ast_queries = self.parse_SqlCommands()
 
         return AST_SQL(ast_tableDecls, ast_queries)
 
-    def parse_SqlQueries(self):
+    def parse_SqlCommands(self):
         success = True
         ast_queries = AST_SqlQueries()
 
         while success:
-            success, ast_query = self.try_SqlQuery()
+            success, ast_query = self.try_SqlCommand()
             if success:
                 ast_queries.addQuery(ast_query)
 
         return ast_queries
 
-    def parse_SqlQuery(self):
+    def parse_SqlCommand(self):
+        success = True
+        ast_command = AST_QCommand()
 
+        while success:
+            ast_q = self.parse_SqlQuery()
+            success, ast_qchain = self.try_QChain()
+            ast_command.addQuery(ast_q, ast_qchain)
+
+        return ast_command
+
+    def parse_QChain(self):
+        success, ast_qchain = self.try_Keyword('INTERSECT')
+        if success:
+            return ast_qchain
+        success, ast_qchain = self.try_Keyword('UNION')
+        if success:
+            return ast_qchain
+        success, ast_qchain = self.try_Keyword('EXCEPT')
+        if success:
+            return ast_qchain
+        return self.parse_Keyword('ADD')
+
+    def parse_SqlQuery(self):
         ast_qselect = self.parse_SqlQuerySelect()
         ast_qfrom = self.parse_SqlQueryFrom()
         ast_query = AST_SqlQuery(ast_qselect, ast_qfrom)
