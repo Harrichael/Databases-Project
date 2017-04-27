@@ -8,7 +8,7 @@ Lexer for SQL like input for assignment
 import re
 
 class Lexer(object):
-    re_token        = re.compile('[\w]+[.][\w]+|[\w]+|[^ \t\n\r\f\v\w]')
+    re_token        = re.compile('["][^"]*["]|[\'][^\']*[\']|[\w]+[.][\w]+|[\w]+|[^ \t\n\r\f\v\w]')
 
     re_identifier   = re.compile('[a-zA-Z](\w)*')
     re_attribute    = re.compile('[a-zA-Z](\w)*[.][a-zA-Z](\w)*|[a-zA-Z](\w)*')
