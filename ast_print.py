@@ -77,7 +77,7 @@ def RAQueryPrint(query):
 
     tables = ' x '.join([table.name for table in query.qfrom.tables])
 
-    print(groupby + project + select + tables + closeParens)
+    print(project + select + groupby + tables + closeParens)
 
 """
 Query Tree Printing
@@ -96,15 +96,18 @@ def RAQTreePrint(command):
     hold_level = level
     for query in command.queries:
         level = hold_level
-        if query.qgb:
-            level += 1
-            node_print('GroupByFunc ' + str(query.qgb.attribute), level)
-        level += 1
+
         node_print('ProjectFunc ' + ', '.join(map(str, query.qselect.selectors)), level)
         if query.qwhere:
             level += 1
             node_print('SelectFunc ' + str(query.qwhere)[6:], level)
         level += 1
+
+        if query.qgb:
+            level += 1
+            node_print('GroupByFunc ' + str(query.qgb.attribute), level)
+        level += 1
+
         node_print('x', level)
         level += 1
         for table in query.qfrom.tables:
