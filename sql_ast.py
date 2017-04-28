@@ -106,6 +106,14 @@ class AST_Select(AST_Node):
     def __str__(self):
         return 'SELECT ' + ', '.join(map(str, self.selectors))
 
+class AST_Aggregate(AST_Node):
+    def __init__(self, keyword, attribute):
+        self.keyword = keyword
+        self.attribute = attribute
+
+    def __str__(self):
+        return self.keyword + ' of ' + str(self.attribute)
+
 class AST_Attribute(AST_Node):
     def __init__(self, token):
         self.token = token

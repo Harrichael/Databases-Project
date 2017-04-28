@@ -23,6 +23,7 @@ from sql_ast import ( AST_TableDecl,
                       AST_BoolExpr,
                       AST_GroupBy,
                       AST_QCommand,
+                      AST_Aggregate,
                     )
 
 def parse_sql(inputStr):
@@ -165,11 +166,10 @@ class SqlParser(Parser):
         for keyword in agg_list:
             success, _ = self.try_Keyword('AVG')
             if( success ):
-                attr = keyword + ' of '
                 self.parse_Terminal('(')
-                attr += str(self.parse_Attribute())
+                attr = self.parse_Attribute()
                 self.parse_Terminal(')')
-                return attr
+                return AST_Aggregate(keyword, attr)
 
 
         return self.parse_Attribute()
