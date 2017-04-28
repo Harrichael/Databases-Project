@@ -160,6 +160,18 @@ class SqlParser(Parser):
         return ast_select
 
     def parse_QSelector(self):
+        agg_list = ['AVG', 'MAX', 'MIN', 'COUNT', 'AVG']
+
+        for keyword in agg_list:
+            success, _ = self.try_Keyword('AVG')
+            if( success ):
+                attr = keyword + ' of '
+                self.parse_Terminal('(')
+                attr += str(self.parse_Attribute())
+                self.parse_Terminal(')')
+                return attr
+
+
         return self.parse_Attribute()
 
     def parse_SqlQueryFrom(self):
