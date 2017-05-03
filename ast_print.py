@@ -108,8 +108,9 @@ def RAQTreePrint(command):
             node_print('GroupByFunc ' + str(query.qgb.attribute), level)
         level += 1
 
-        node_print('x', level)
-        level += 1
+        if len(query.qfrom.tables) > 1:
+            node_print('x', level)
+            level += 1
         for table in query.qfrom.tables:
             node_print(table.name, level)
 
