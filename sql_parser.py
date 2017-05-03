@@ -238,7 +238,7 @@ class SqlParser(Parser):
         success, ast_bc = self.try_Terminal('>=')
         if success:
             return ast_bc
-        ast_bc = self.parse_Terminal('!=')
+        ast_bc = self.parse_Terminal('<>')
         return ast_bc
 
     def parse_BoolChain(self):
