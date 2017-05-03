@@ -8,6 +8,8 @@ This file handles abstract syntax tree printing
 """
 AST SQL Printing
 """
+from sql_ast import AST_Aggregate
+
 def PrettyASTPrint(root):
     for qcommand in root.queries.queries:
         QCPrettyPrint(qcommand)
@@ -80,7 +82,9 @@ def RAQueryPrint(query, tables):
     groupby = ''
     if query.qgb:
         closeParens += ')'
-        groupby = 'GroupByFunc ' + str(query.qgb.attribute) + '('
+        aggregators = [str(s) for s in query.qselect.selectors if type(s) == AST_Aggregate]
+        aggregators.append(str(query.qgb.attribute))
+        groupby = 'GroupByFunc ' + ', '.join(aggregators) + '('
 
     tables = ' x '.join([table.name for table in query.qfrom.tables])
 
@@ -113,15 +117,16 @@ def RAQTreePrint(command, tables):
 
         node_print('ProjectFunc ' + ', '.join(map(selector_to_str, query.qselect.selectors)), level)
         level += 1
-        
+
         if query.qwhere:
             level += 1
             node_print('SelectFunc ' + str(query.qwhere)[6:], level)
         level += 1
 
         if query.qgb:
-            level += 1
-            node_print('GroupByFunc ' + str(query.qgb.attribute), level)
+            aggregators = [str(s) for s in query.qselect.selectors if type(s) == AST_Aggregate]
+            aggregators.append(str(query.qgb.attribute))
+            node_print('GroupByFunc ' + ', '.join(aggregators), level)
         level += 1
 
         if len(query.qfrom.tables) > 1:
