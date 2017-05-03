@@ -140,7 +140,7 @@ class AST_FromTable(AST_Node):
         self.alias = alias
 
     def __str__(self):
-        if self.alise:
+        if self.alias:
             return self.alias + '-' + self.name
         else:
             return self.name
