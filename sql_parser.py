@@ -166,7 +166,7 @@ class SqlParser(Parser):
         agg_list = ['AVG', 'MAX', 'MIN', 'COUNT', 'AVG']
 
         for keyword in agg_list:
-            success, _ = self.try_Keyword('AVG')
+            success, _ = self.try_Keyword(keyword)
             if( success ):
                 self.parse_Terminal('(')
                 attr = self.parse_Attribute()

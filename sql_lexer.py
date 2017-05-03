@@ -27,15 +27,16 @@ class Lexer(object):
         'UNION',
         'EXCEPT',
         'ADD',
-
-        'HAVING',
-        'CONTAINS',
-        'IN',
-        'EXISTS',
         'MAX',
         'MIN',
         'COUNT',
         'AVG',
+
+        'HAVING',
+
+        'CONTAINS',
+        'IN',
+        'EXISTS',
     ])
     sentinelToken   = ''
 
