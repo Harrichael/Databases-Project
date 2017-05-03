@@ -119,6 +119,8 @@ class SqlParser(Parser):
             success, ast_qchain = self.try_QChain()
             ast_command.addQuery(ast_q, ast_qchain)
 
+        self.try_Terminal(';')
+
         return ast_command
 
     def parse_QChain(self):
