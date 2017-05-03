@@ -112,6 +112,8 @@ def RAQTreePrint(command, tables):
                 return str(selector)
 
         node_print('ProjectFunc ' + ', '.join(map(selector_to_str, query.qselect.selectors)), level)
+        level += 1
+        
         if query.qwhere:
             level += 1
             node_print('SelectFunc ' + str(query.qwhere)[6:], level)

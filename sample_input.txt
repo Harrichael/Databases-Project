@@ -13,14 +13,14 @@ FROM     Reserves
 GROUP BY n
 
 SELECT Boats.bid     FROM  Boats
-     WHERE    Boats.name  =  "interlake"
+     WHERE    Boats.name  = "interlake";
 
 SELECT   Reserves.bid, Reserves.sid
 FROM     Reserves, MyTable
 GROUP BY n
 
 SELECT Boats.bid     FROM  Boats
-     WHERE    Boats.name  =  "interlake"
+    WHERE    Boats.name  = "interlake";
 
 SELECT * FROM Customers
 WHERE CustomerID=1;
