@@ -24,6 +24,7 @@ from sql_ast import ( AST_TableDecl,
                       AST_GroupBy,
                       AST_QCommand,
                       AST_Aggregate,
+                      AST_Having,
                     )
 
 def parse_sql(inputStr):
@@ -148,6 +149,10 @@ class SqlParser(Parser):
         if success:
             ast_query.setGroupBy(ast_qgb)
 
+        success, ast_hv = self.try_SqlQueryHaving()
+        if success:
+            ast_query.setHaving(ast_hv)
+
         return ast_query
 
     def parse_SqlQuerySelect(self):
@@ -176,6 +181,7 @@ class SqlParser(Parser):
 
         return self.parse_Attribute()
 
+
     def parse_SqlQueryFrom(self):
         success = True
         ast_from = AST_From()
@@ -196,6 +202,19 @@ class SqlParser(Parser):
             ast_fromTable.setAlias(alias)
 
         return ast_fromTable
+
+    def parse_SqlQueryHaving(self):
+        success = True
+        ast_where = AST_Having()
+        ast_bc = None
+
+        self.parse_Keyword('HAVING')
+        while success:
+            ast_boolClause = self.parse_BoolClause()
+            ast_where.addBoolExpr(ast_boolClause, ast_bc)
+            success, ast_bc = self.try_BoolChain()
+
+        return ast_where
 
     def parse_SqlQueryWhere(self):
         success = True
@@ -218,7 +237,7 @@ class SqlParser(Parser):
         return AST_BoolExpr(lhs, comp, rhs)
 
     def parse_BoolTerm(self):
-        success, ast_bt = self.try_Attribute()
+        success, ast_bt = self.try_QSelector()
         if success:
             return ast_bt
         ast_bt = self.parse_Value()

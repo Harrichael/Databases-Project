@@ -42,6 +42,14 @@ def QueryPrettyPrint(query):
         node_print('Group By', 1)
         node_print(str(query.qgb.attribute), 2)
 
+        if query.qhaving:
+            node_print('Having', 1)
+            for e, c in zip(query.qhaving.boolExprs, query.qhaving.boolComps):
+                if c:
+                    node_print(str(c) + ' ' + str(e), 2)
+                else:
+                    node_print(str(e), 2)
+
 """
 Relational Algebra Printing
 """
@@ -84,7 +92,16 @@ def RAQueryPrint(query, tables):
         closeParens += ')'
         aggregators = [str(s) for s in query.qselect.selectors if type(s) == AST_Aggregate]
         aggregators.append(str(query.qgb.attribute))
-        groupby = 'GroupByFunc ' + ', '.join(aggregators) + '('
+        if(query.qhaving):
+            for e in query.qhaving.boolExprs:
+                if type(e.lhs) == AST_Aggregate:
+                    aggregators.append(str(e.lhs))
+                if type(e.rhs) == AST_Aggregate:
+                    aggregators.append(srt(e.lhs))
+            closeParens += ')'
+            groupby = 'SelectFunc ' + str(query.qhaving)[7:] + ' (GroupByFunc ' + ', '.join(aggregators) + '('
+        else:        
+            groupby = 'GroupByFunc ' + ', '.join(aggregators) + '('
 
     tables = ' x '.join([table.name for table in query.qfrom.tables])
 
@@ -126,6 +143,14 @@ def RAQTreePrint(command, tables):
         if query.qgb:
             aggregators = [str(s) for s in query.qselect.selectors if type(s) == AST_Aggregate]
             aggregators.append(str(query.qgb.attribute))
+            if(query.qhaving):
+                for e in query.qhaving.boolExprs:
+                    if type(e.lhs) == AST_Aggregate:
+                        aggregators.append(str(e.lhs))
+                    if type(e.rhs) == AST_Aggregate:
+                        aggregators.append(srt(e.lhs))
+                node_print('SelectFunc ' + str(query.qhaving)[7:], level)
+                level += 1
             node_print('GroupByFunc ' + ', '.join(aggregators), level)
         level += 1
 
