@@ -11,7 +11,7 @@ class Lexer(object):
     re_token        = re.compile('["][^"]*["]|[\'][^\']*[\']|[\w]+[.][\w]+|[\w]+|[^ \t\n\r\f\v\w]')
 
     re_identifier   = re.compile('[a-zA-Z](\w)*')
-    re_attribute    = re.compile('[a-zA-Z](\w)*[.][a-zA-Z](\w)*|[a-zA-Z](\w)*')
+    re_attribute    = re.compile('[*]|[a-zA-Z](\w)*[.][a-zA-Z](\w)*|[a-zA-Z](\w)*')
     re_value        = re.compile('[+-]?[0-9]+[.][0-9]+|[+-]?[0-9]+|["][^"]*["]|[\'][^\']*[\']')
 
     keywords = set([

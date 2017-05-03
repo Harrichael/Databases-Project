@@ -45,12 +45,12 @@ Relational Algebra Printing
 """
 def RAPrint(root):
     for command in root.queries.queries:
-        RACommPrint(command)
+        RACommPrint(command, root.tables.tables)
         print('\n')
 
-def RACommPrint(command):
+def RACommPrint(command, tables):
     for query, qc in zip(command.queries, command.qChains):
-        RAQueryPrint(query)
+        RAQueryPrint(query, tables)
         if qc == 'INTERSECT':
             print('intersect')
         elif qc == 'UNION':
@@ -60,10 +60,17 @@ def RACommPrint(command):
         elif qc == 'EXCEPT':
             print('-')
 
-def RAQueryPrint(query):
+def RAQueryPrint(query, tables):
     closeParens = ')'
 
-    project = 'ProjectFunc ' + ', '.join(map(str, query.qselect.selectors)) + '('
+    def selector_to_str(selector):
+        if(str(selector) == "*"):
+            tableIndex = [t.name for t in tables].index(query.qfrom.tables[0].name)
+            return ', '.join(map(lambda el: str(el).split(":")[0], tables[tableIndex].attributes))
+        else:
+            return str(selector)
+
+    project = 'ProjectFunc ' + ', '.join(map(selector_to_str, query.qselect.selectors)) + '('
 
     select = ''
     if query.qwhere:
@@ -84,10 +91,10 @@ Query Tree Printing
 """
 def RAQsTreePrint(root):
     for query in root.queries.queries:
-        RAQTreePrint(query)
+        RAQTreePrint(query, root.tables.tables)
         print('\n')
 
-def RAQTreePrint(command):
+def RAQTreePrint(command, tables):
     level = -1
 
     if command.qChains[0]:
@@ -97,7 +104,14 @@ def RAQTreePrint(command):
     for query in command.queries:
         level = hold_level
 
-        node_print('ProjectFunc ' + ', '.join(map(str, query.qselect.selectors)), level)
+        def selector_to_str(selector):
+            if(str(selector) == "*"):
+                tableIndex = [t.name for t in tables].index(query.qfrom.tables[0].name)
+                return ', '.join(map(lambda el: str(el).split(":")[0], tables[tableIndex].attributes))
+            else:
+                return str(selector)
+
+        node_print('ProjectFunc ' + ', '.join(map(selector_to_str, query.qselect.selectors)), level)
         if query.qwhere:
             level += 1
             node_print('SelectFunc ' + str(query.qwhere)[6:], level)

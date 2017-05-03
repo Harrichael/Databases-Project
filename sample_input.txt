@@ -1,6 +1,8 @@
 Sailors(sid:integer, sname:string, rating:integer, age:real)
 Boats(bid:integer, bname:string, color:string)
 Reserves(sid:integer, bid:integer, day:date)
+Customers(CustomerID:Inter, name:string)
+
 
 SELECT    Sname
 FROM       Sailors
@@ -11,11 +13,14 @@ FROM     Reserves
 GROUP BY n
 
 SELECT Boats.bid     FROM  Boats
-     WHERE    Boats.name  =  “interlake”
+     WHERE    Boats.name  =  "interlake"
 
 SELECT   Reserves.bid, Reserves.sid
 FROM     Reserves, MyTable
 GROUP BY n
 
 SELECT Boats.bid     FROM  Boats
-     WHERE    Boats.name  =  “interlake”
+     WHERE    Boats.name  =  "interlake"
+
+SELECT * FROM Customers
+WHERE CustomerID=1;

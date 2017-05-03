@@ -18,6 +18,7 @@ class Parser(object):
     def getToken(self):
         try:
             self.token = next(self.iTokens)
+            print "Token: " + self.token
         except StopIteration:
             raise ParserException('Unexpected end of input!')
 
