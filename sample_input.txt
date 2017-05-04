@@ -17,7 +17,9 @@ SELECT Boats.bid     FROM  Boats
 
 SELECT   Reserves.bid, Reserves.sid
 FROM     Reserves, MyTable
+WHERE sid = 1
 GROUP BY n
+HAVING COUNT(bid) > 10;
 
 SELECT Boats.bid     FROM  Boats
     WHERE    Boats.name  = "interlake";
