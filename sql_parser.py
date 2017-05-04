@@ -279,7 +279,7 @@ class SqlParser(Parser):
         while success:
             ast_attr = self.parse_Attribute()
             ast_gb.addAttribute(ast_attr)
-            success, ast_attr = self.try_Terminal(',')
+            success, _ = self.try_Terminal(',')
 
         return ast_gb
 
