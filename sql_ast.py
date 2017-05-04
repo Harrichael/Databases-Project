@@ -185,6 +185,12 @@ class AST_BoolFullExpr(AST_Node):
             if c:
                 yield c
 
+    @property
+    def aggregators(self):
+        for e in self.boolExprs:
+            for agg in e.aggregators:
+                yield agg
+
     def __str__(self):
         if len(self.boolExprs) == 1:
             return str(self.boolExprs[0])
@@ -207,6 +213,12 @@ class AST_Having(AST_Node):
             if c:
                 yield c
 
+    @property
+    def aggregators(self):
+        for e in self.boolExprs:
+            for agg in e.aggregators:
+                yield agg
+
     def __str__(self):
         return 'HAVING ' + ' '.join(map(str, self.boolEC))
 
@@ -216,6 +228,13 @@ class AST_BoolExpr(AST_Node):
         self.lhs = lhs
         self.comp = comp
         self.rhs = rhs
+
+    @property
+    def aggregators(self):
+        if type(self.lhs) == AST_Aggregate:
+            yield str(self.lhs)
+        if type(self.rhs) == AST_Aggregate:
+            yield str(self.rhs)
 
     def __str__(self):
         return ' '.join(map(str, [self.lhs, self.comp, self.rhs]))

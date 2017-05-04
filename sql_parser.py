@@ -205,15 +205,11 @@ class SqlParser(Parser):
         return ast_fromTable
 
     def parse_SqlQueryHaving(self):
-        success = True
         ast_where = AST_Having()
-        ast_bc = None
 
         self.parse_Keyword('HAVING')
-        while success:
-            ast_boolClause = self.parse_BoolClause()
-            ast_where.addBoolExpr(ast_boolClause, ast_bc)
-            success, ast_bc = self.try_BoolChain()
+        ast_bfe = self.parse_BoolFullExpr()
+        ast_where.addBoolExpr(ast_bfe, None)
 
         return ast_where
 

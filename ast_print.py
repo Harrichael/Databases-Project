@@ -92,12 +92,9 @@ def RAQueryPrint(query, tables):
         closeParens += ')'
         aggregators = [str(s) for s in query.qselect.selectors if type(s) == AST_Aggregate]
         aggregators.extend(map(str, query.qgb.attributes))
-        if(query.qhaving):
-            for e in query.qhaving.boolExprs:
-                if type(e.lhs) == AST_Aggregate:
-                    aggregators.append(str(e.lhs))
-                if type(e.rhs) == AST_Aggregate:
-                    aggregators.append(srt(e.lhs))
+        if query.qhaving:
+            aggregators.extend(query.qhaving.aggregators)
+
             closeParens += ')'
             groupby = 'SelectFunc ' + str(query.qhaving)[7:] + ' (GroupByFunc ' + ', '.join(aggregators) + '('
         else:        
@@ -138,12 +135,8 @@ def RAQTreePrint(command, tables):
         if query.qgb:
             aggregators = [str(s) for s in query.qselect.selectors if type(s) == AST_Aggregate]
             aggregators.extend(map(str, query.qgb.attributes))
-            if(query.qhaving):
-                for e in query.qhaving.boolExprs:
-                    if type(e.lhs) == AST_Aggregate:
-                        aggregators.append(str(e.lhs))
-                    if type(e.rhs) == AST_Aggregate:
-                        aggregators.append(srt(e.lhs))
+            if query.qhaving:
+                aggregators.extend(query.qhaving.aggregators)
                 level += 1
                 node_print('SelectFunc ' + str(query.qhaving)[7:], level)
             level += 1
