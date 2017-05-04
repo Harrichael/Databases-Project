@@ -16,7 +16,7 @@ from sql_ast import ( AST_Aggregate,
 def PrettyASTPrint(root, level=0):
     for query in root.queries.queries:
         PrettyASTQPrint(query, level)
-    print('\n')
+        print('\n')
 
 def PrettyASTQPrint(query, level):
     if type(query) is AST_QChain:
