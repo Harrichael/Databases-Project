@@ -55,6 +55,21 @@ class AST_SqlQueries(AST_Node):
     def __str__(self):
         return '\n\n'.join(map(str, self.queries))
 
+class AST_QChain(AST_Node):
+    def __init__(self, qchain, left, right):
+        self.qchain = qchain
+        self.left = left
+        self.right = right
+
+    def __str__(self):
+        return '\n'.join(map(str, [
+            self.qchain,
+            'First Operand: ',
+            self.left,
+            'Second Operand: ',
+            self.right
+        ]))
+
 class AST_SqlQuery(AST_Node):
     def __init__(self, qselect, qfrom):
         self.qselect = qselect
@@ -62,8 +77,6 @@ class AST_SqlQuery(AST_Node):
         self.qwhere = None
         self.qgb = None
         self.qhaving = None
-        self.qchain = None
-        self.child = None
 
     def setWhere(self, qwhere):
         self.qwhere = qwhere
@@ -74,20 +87,13 @@ class AST_SqlQuery(AST_Node):
     def setGroupBy(self, qgb):
         self.qgb = qgb
 
-    def setChild(self, qchain, query):
-        self.qchain = qchain
-        self.child = query
-
     def __str__(self):
         return '\n'.join(map(str, [
-            'Query: ',
             self.qselect,
             self.qfrom,
             self.qwhere,
             self.qgb,
             self.qhaving,
-            self.qchain,
-            self.child,
         ]))
 
 class AST_Select(AST_Node):

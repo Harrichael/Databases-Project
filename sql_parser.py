@@ -25,6 +25,7 @@ from sql_ast import ( AST_TableDecl,
                       AST_Aggregate,
                       AST_Having,
                       AST_BoolFullExpr,
+                      AST_QChain,
                     )
 
 def parse_sql(inputStr):
@@ -131,6 +132,19 @@ class SqlParser(Parser):
         return self.parse_Keyword('ADD')
 
     def parse_SqlQuery(self):
+        success, _ = self.try_Terminal('(')
+        if success:
+            ast_q = self.parse_SqlQuery()
+            self.parse_Terminal(')')
+            success, ast_qchain = self.try_QChain()
+            if success:
+                ast_q_n = self.parse_SqlQuery()
+                return AST_QChain(ast_qchain, ast_q, ast_q_n)
+            return ast_q
+        else:
+            return self.parse_SqlQueryInner()
+
+    def parse_SqlQueryInner(self):
         ast_qselect = self.parse_SqlQuerySelect()
         ast_qfrom = self.parse_SqlQueryFrom()
         ast_query = AST_SqlQuery(ast_qselect, ast_qfrom)
@@ -149,7 +163,9 @@ class SqlParser(Parser):
 
         success, ast_qchain = self.try_QChain()
         if success:
-            ast_query.setChild(ast_qchain, self.parse_SqlQuery())
+            ast_q = self.parse_SqlQuery()
+
+            return AST_QChain(ast_qchain, ast_query, ast_q)
 
         return ast_query
 
