@@ -19,10 +19,12 @@ SELECT   Reserves.bid, Reserves.sid
 FROM     Reserves, MyTable
 WHERE sid = 1
 GROUP BY n
-HAVING COUNT(bid) > 10;
+HAVING COUNT(bid) > 10
+INTERSECT
 
 SELECT Boats.bid     FROM  Boats
-    WHERE    Boats.name  = "interlake";
+    WHERE    Boats.name  = "interlake"
 
+UNION
 SELECT * FROM Customers
 WHERE CustomerID=1;

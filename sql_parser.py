@@ -22,7 +22,6 @@ from sql_ast import ( AST_TableDecl,
                       AST_Where,
                       AST_BoolExpr,
                       AST_GroupBy,
-                      AST_QCommand,
                       AST_Aggregate,
                       AST_Having,
                       AST_BoolFullExpr,
@@ -113,17 +112,11 @@ class SqlParser(Parser):
         return ast_queries
 
     def parse_SqlCommand(self):
-        success = True
-        ast_command = AST_QCommand()
-
-        while success:
-            ast_q = self.parse_SqlQuery()
-            success, ast_qchain = self.try_QChain()
-            ast_command.addQuery(ast_q, ast_qchain)
+        ast_q = self.parse_SqlQuery()
 
         self.try_Terminal(';')
 
-        return ast_command
+        return ast_q
 
     def parse_QChain(self):
         success, ast_qchain = self.try_Keyword('INTERSECT')
@@ -153,6 +146,10 @@ class SqlParser(Parser):
         success, ast_hv = self.try_SqlQueryHaving()
         if success:
             ast_query.setHaving(ast_hv)
+
+        success, ast_qchain = self.try_QChain()
+        if success:
+            ast_query.setChild(ast_qchain, self.parse_SqlQuery())
 
         return ast_query
 

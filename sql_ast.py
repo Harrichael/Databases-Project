@@ -55,25 +55,6 @@ class AST_SqlQueries(AST_Node):
     def __str__(self):
         return '\n\n'.join(map(str, self.queries))
 
-class AST_QCommand(AST_Node):
-    def __init__(self):
-        self.queries = []
-        self.qChains = []
-
-    def addQuery(self, ast_query, ast_qchain):
-        self.queries.append(ast_query)
-        self.qChains.append(ast_qchain)
-
-    @property
-    def qqc(self):
-        for q, qc in zip(self.queries, self.qChains):
-            yield q
-            if qc:
-                yield qc
-
-    def __str__(self):
-        return '\n\n'.join(map(str, self.qqc))
-
 class AST_SqlQuery(AST_Node):
     def __init__(self, qselect, qfrom):
         self.qselect = qselect
@@ -81,6 +62,8 @@ class AST_SqlQuery(AST_Node):
         self.qwhere = None
         self.qgb = None
         self.qhaving = None
+        self.qchain = None
+        self.child = None
 
     def setWhere(self, qwhere):
         self.qwhere = qwhere
@@ -91,6 +74,10 @@ class AST_SqlQuery(AST_Node):
     def setGroupBy(self, qgb):
         self.qgb = qgb
 
+    def setChild(self, qchain, query):
+        self.qchain = qchain
+        self.child = query
+
     def __str__(self):
         return '\n'.join(map(str, [
             'Query: ',
@@ -99,6 +86,8 @@ class AST_SqlQuery(AST_Node):
             self.qwhere,
             self.qgb,
             self.qhaving,
+            self.qchain,
+            self.child,
         ]))
 
 class AST_Select(AST_Node):
