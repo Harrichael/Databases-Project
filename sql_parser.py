@@ -25,6 +25,7 @@ from sql_ast import ( AST_TableDecl,
                       AST_QCommand,
                       AST_Aggregate,
                       AST_Having,
+                      AST_BoolFullExpr,
                     )
 
 def parse_sql(inputStr):
@@ -217,24 +218,56 @@ class SqlParser(Parser):
         return ast_where
 
     def parse_SqlQueryWhere(self):
-        success = True
         ast_where = AST_Where()
-        ast_bc = None
 
         self.parse_Keyword('WHERE')
-        while success:
-            ast_boolClause = self.parse_BoolClause()
-            ast_where.addBoolExpr(ast_boolClause, ast_bc)
-            success, ast_bc = self.try_BoolChain()
+        ast_bfe = self.parse_BoolFullExpr()
+        ast_where.addBoolExpr(ast_bfe, None)
 
         return ast_where
 
-    def parse_BoolClause(self):
-        lhs = self.parse_BoolTerm()
-        comp = self.parse_BoolComp()
-        rhs = self.parse_BoolTerm()
+    def parse_BoolFullExpr(self):
+        success = True
+        ast_bc = None
+        ast_bfe = AST_BoolFullExpr()
 
-        return AST_BoolExpr(lhs, comp, rhs)
+        while success:
+            s, _ = self.try_Terminal('(')
+            if s:
+                ast_bfei = self.parse_BoolFullExpr()
+                self.parse_Terminal(')')
+            else:
+                ast_bfei = self.parse_BoolFullExprInner()
+
+            ast_bfe.addBoolExpr(ast_bfei, ast_bc)
+            success, ast_bc = self.try_BoolChain()
+
+        return ast_bfe
+
+    def parse_BoolFullExprInner(self):
+        success = True
+        ast_bc = None
+        ast_bfe = AST_BoolFullExpr()
+        while success:
+            ast_boolClause = self.parse_BoolClause()
+            ast_bfe.addBoolExpr(ast_boolClause, ast_bc)
+            success, ast_bc = self.try_BoolChain()
+
+        return ast_bfe
+
+    def parse_BoolClause(self):
+        success, _ = self.try_Terminal('(')
+        if success:
+            ast_bfe = self.parse_BoolFullExprInner()
+
+            self.parse_Terminal(')')
+            return ast_bfe
+        else:
+            lhs = self.parse_BoolTerm()
+            comp = self.parse_BoolComp()
+            rhs = self.parse_BoolTerm()
+
+            return AST_BoolExpr(lhs, comp, rhs)
 
     def parse_BoolTerm(self):
         success, ast_bt = self.try_QSelector()

@@ -6,7 +6,7 @@ Customers(CustomerID:Inter, name:string)
 
 SELECT    Sname
 FROM       Sailors
-WHERE    Sailor.sid   = 1
+WHERE    ( ( Sailor.sid   = 1 AND Sailor.sname = "Michael" ) OR Sailor.sname = "Grant" )
 
 SELECT   Reserves.bid, Reserves.sid
 FROM     Reserves

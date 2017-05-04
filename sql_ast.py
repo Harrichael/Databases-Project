@@ -169,6 +169,28 @@ class AST_Where(AST_Node):
     def __str__(self):
         return 'WHERE ' + ' '.join(map(str, self.boolEC))
 
+class AST_BoolFullExpr(AST_Node):
+    def __init__(self):
+        self.boolExprs = []
+        self.boolComps = []
+
+    def addBoolExpr(self, ast_be, ast_bc):
+        self.boolExprs.append(ast_be)
+        self.boolComps.append(ast_bc)
+
+    @property
+    def boolEC(self):
+        for e, c in zip(self.boolExprs, self.boolComps[1:] + [None]):
+            yield e
+            if c:
+                yield c
+
+    def __str__(self):
+        if len(self.boolExprs) == 1:
+            return str(self.boolExprs[0])
+        return '( ' + ' '.join(map(str, self.boolEC)) + ' ) '
+
+
 class AST_Having(AST_Node):
     def __init__(self):
         self.boolExprs = []

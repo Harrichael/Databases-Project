@@ -34,8 +34,9 @@ class Parser(object):
             parseName = 'parse_' + name[4:]
             parseAttr = getattr(self, parseName)
             setattr(self, name, self.getTryDecorator()(parseAttr))
+            return getattr(self, name)
 
-        return getattr(self, name)
+        raise AttributeError('Attribute does not exist: {}'.format(name))
 
     def getTryDecorator(self):
         def tryDecorator(parseFunc):
