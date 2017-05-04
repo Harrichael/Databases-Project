@@ -199,9 +199,12 @@ class AST_BoolExpr(AST_Node):
         return ' '.join(map(str, [self.lhs, self.comp, self.rhs]))
 
 class AST_GroupBy(AST_Node):
-    def __init__(self, attribute):
-        self.attribute = attribute
+    def __init__(self):
+        self.attributes = []
+
+    def addAttribute(self, attribute):
+        self.attributes.append(attribute)
 
     def __str__(self):
-        return 'GROUP BY ' + str(self.attribute)
+        return 'GROUP BY ' + ', '.join(map(str, self.attributes))
 

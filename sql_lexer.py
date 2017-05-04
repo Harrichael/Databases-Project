@@ -53,6 +53,9 @@ class Lexer(object):
 
     @classmethod
     def attribute(cls, token):
+        if token.upper() in cls.keywords:
+            return False
+
         return cls.re_attribute.match(token)
 
     @classmethod

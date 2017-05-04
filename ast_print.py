@@ -40,7 +40,7 @@ def QueryPrettyPrint(query):
 
     if query.qgb:
         node_print('Group By', 1)
-        node_print(str(query.qgb.attribute), 2)
+        node_print(str(query.qgb)[9:], 2)
 
         if query.qhaving:
             node_print('Having', 1)
@@ -91,7 +91,7 @@ def RAQueryPrint(query, tables):
     if query.qgb:
         closeParens += ')'
         aggregators = [str(s) for s in query.qselect.selectors if type(s) == AST_Aggregate]
-        aggregators.append(str(query.qgb.attribute))
+        aggregators.extend(map(str, query.qgb.attributes))
         if(query.qhaving):
             for e in query.qhaving.boolExprs:
                 if type(e.lhs) == AST_Aggregate:
@@ -137,7 +137,7 @@ def RAQTreePrint(command, tables):
 
         if query.qgb:
             aggregators = [str(s) for s in query.qselect.selectors if type(s) == AST_Aggregate]
-            aggregators.append(str(query.qgb.attribute))
+            aggregators.extend(map(str, query.qgb.attributes))
             if(query.qhaving):
                 for e in query.qhaving.boolExprs:
                     if type(e.lhs) == AST_Aggregate:

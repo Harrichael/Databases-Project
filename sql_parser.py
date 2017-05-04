@@ -272,9 +272,16 @@ class SqlParser(Parser):
     def parse_SqlQueryGroupBy(self):
         self.parse_Keyword('GROUP')
         self.parse_Keyword('BY')
-        ast_attr = self.parse_Attribute()
 
-        return AST_GroupBy(ast_attr)
+        ast_gb = AST_GroupBy()
+
+        success = True
+        while success:
+            ast_attr = self.parse_Attribute()
+            ast_gb.addAttribute(ast_attr)
+            success, ast_attr = self.try_Terminal(',')
+
+        return ast_gb
 
     def parse_TableStatements(self):
         ast_tables = AST_TableDecls()
