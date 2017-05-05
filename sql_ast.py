@@ -118,6 +118,9 @@ class AST_Attribute(AST_Node):
     def __init__(self, token):
         self.token = token
 
+    def mystring(self, handler):
+        return self.token
+
     def __str__(self):
         return self.token
 
@@ -161,6 +164,11 @@ class AST_Where(AST_Node):
             if c:
                 yield c
 
+    def mystring(self, handler):
+        if len(self.boolExprs) == 1:
+            return self.boolExprs[0].mystring(handler)
+        return '( ' + ' '.join(map(str, self.myBoolEC(handler))) + ' ) '
+
     def __str__(self):
         return 'WHERE ' + ' '.join(map(str, self.boolEC))
 
@@ -180,11 +188,22 @@ class AST_BoolFullExpr(AST_Node):
             if c:
                 yield c
 
+    def myBoolEC(self, handler):
+        for e, c in zip(self.boolExprs, self.boolComps[1:] + [None]):
+            yield e.mystring(handler)
+            if c:
+                yield c
+
     @property
     def aggregators(self):
         for e in self.boolExprs:
             for agg in e.aggregators:
                 yield agg
+
+    def mystring(self, handler):
+        if len(self.boolExprs) == 1:
+            return self.boolExprs[0].mystring(handler)
+        return '( ' + ' '.join(map(str, self.myBoolEC(handler))) + ' ) '
 
     def __str__(self):
         if len(self.boolExprs) == 1:
@@ -217,6 +236,16 @@ class AST_Having(AST_Node):
     def __str__(self):
         return 'HAVING ' + ' '.join(map(str, self.boolEC))
 
+class AST_NestQuery(AST_Node):
+    def __init__(self, keyword, ast_query):
+        self.keyword = keyword
+        self.query = ast_query
+
+    def mystring(self, handler):
+        return '\n'.join(handler(self))
+
+    def __str__(self):
+        return self.keyword + ' ( \n' + str(self.query) + ' ) '
 
 class AST_BoolExpr(AST_Node):
     def __init__(self, lhs, comp, rhs):
@@ -230,6 +259,9 @@ class AST_BoolExpr(AST_Node):
             yield str(self.lhs)
         if type(self.rhs) == AST_Aggregate:
             yield str(self.rhs)
+
+    def mystring(self, handler):
+        return str(self)
 
     def __str__(self):
         return ' '.join(map(str, [self.lhs, self.comp, self.rhs]))

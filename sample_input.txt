@@ -8,6 +8,13 @@ SELECT    Sname
 FROM       Sailors
 WHERE    ( ( Sailor.sid   = 1 AND Sailor.sname = "Michael" ) OR Sailor.sname = "Grant" )
 
+SELECT    Sname
+FROM      Sailors as R
+WHERE     EXISTS ( SELECT * FROM Reserves WHERE sid = R.sid)
+
+SELECT    Sname
+FROM      Sailors as R
+
 SELECT   Reserves.bid, Reserves.sid
 FROM     Reserves
 GROUP BY n

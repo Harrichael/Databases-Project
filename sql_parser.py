@@ -26,6 +26,7 @@ from sql_ast import ( AST_TableDecl,
                       AST_Having,
                       AST_BoolFullExpr,
                       AST_QChain,
+                      AST_NestQuery,
                     )
 
 def parse_sql(inputStr):
@@ -195,7 +196,6 @@ class SqlParser(Parser):
 
         return self.parse_Attribute()
 
-
     def parse_SqlQueryFrom(self):
         success = True
         ast_from = AST_From()
@@ -271,12 +271,21 @@ class SqlParser(Parser):
 
             self.parse_Terminal(')')
             return ast_bfe
+
+        success, ast_nestQuery = self.try_NestQuery()
+        if success:
+            return ast_nestQuery
         else:
             lhs = self.parse_BoolTerm()
             comp = self.parse_BoolComp()
             rhs = self.parse_BoolTerm()
 
             return AST_BoolExpr(lhs, comp, rhs)
+
+    def parse_NestQuery(self):
+        keyword = self.parse_Keyword('EXISTS')
+        ast_query = self.parse_SqlQuery()
+        return AST_NestQuery(keyword, ast_query)
 
     def parse_BoolTerm(self):
         success, ast_bt = self.try_QSelector()
