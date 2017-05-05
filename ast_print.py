@@ -174,13 +174,13 @@ def RAQTreePrint(query, tables, level=-1):
         level += 1
         node_print('SelectFunc ' + query.qwhere.mystring(handler), level)
 
-    if len(query.qfrom.tables) > 1:
-        level += 1
-        node_print('x', level)
 
     sql_tables = list(query.qfrom.tables)
     for q in nested_queries:
         sql_tables.extend(q.qfrom.tables)
+    if len(sql_tables) > 1:
+        level += 1
+        node_print('x', level)
     level += 1
     for table in sql_tables:
         node_print(table.name, level)
