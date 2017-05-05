@@ -236,10 +236,13 @@ class SqlParser(Parser):
         return ast_where
 
     def parse_BoolFullExpr(self):
-        success = True
         ast_bc = None
         ast_bfe = AST_BoolFullExpr()
 
+        success, _ = self.try_Keyword('NOT')
+        if success:
+            ast_bfe.invert = True
+        success = True
         while success:
             s, _ = self.try_Terminal('(')
             if s:
@@ -267,7 +270,7 @@ class SqlParser(Parser):
     def parse_BoolClause(self):
         success, _ = self.try_Terminal('(')
         if success:
-            ast_bfe = self.parse_BoolFullExprInner()
+            ast_bfe = self.parse_BoolFullExpr()
 
             self.parse_Terminal(')')
             return ast_bfe

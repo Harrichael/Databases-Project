@@ -6,7 +6,7 @@ Customers(CustomerID:Inter, name:string)
 
 SELECT    Sname
 FROM       Sailors
-WHERE    ( ( Sailor.sid   = 1 AND Sailor.sname = "Michael" ) OR Sailor.sname = "Grant" )
+WHERE    NOT ( ( NOT Sailor.sid   = 1 AND Sailor.sname = "Michael" ) OR Sailor.sname = "Grant" )
 
 SELECT    Sname
 FROM      Sailors as R
@@ -36,3 +36,7 @@ SELECT Boats.bid     FROM  Boats
 UNION
 SELECT * FROM Customers
 WHERE CustomerID=1;
+
+SELECT      S.sid
+FROM        Sailors AS S,  Reserves AS R, Boats AS B
+WHERE     S.sid=R.sid AND R.bid=B.bid AND B.color="red" EXCEPT SELECT      S2.sid FROM        Sailors AS S2,  Reserves AS R2, Boats AS B2 WHERE     S2.sid=R2.sid AND R2.bid=B2.bid AND B.2color="green"

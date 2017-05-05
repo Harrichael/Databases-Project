@@ -176,6 +176,7 @@ class AST_BoolFullExpr(AST_Node):
     def __init__(self):
         self.boolExprs = []
         self.boolComps = []
+        self.invert = False
 
     def addBoolExpr(self, ast_be, ast_bc):
         self.boolExprs.append(ast_be)
@@ -200,15 +201,21 @@ class AST_BoolFullExpr(AST_Node):
             for agg in e.aggregators:
                 yield agg
 
+    @property
+    def prefix(self):
+        if self.invert:
+            return 'Not '
+        return ''
+
     def mystring(self, handler):
         if len(self.boolExprs) == 1:
-            return self.boolExprs[0].mystring(handler)
-        return '( ' + ' '.join(map(str, self.myBoolEC(handler))) + ' ) '
+            return self.prefix + self.boolExprs[0].mystring(handler)
+        return self.prefix + '( ' + ' '.join(map(str, self.myBoolEC(handler))) + ' ) '
 
     def __str__(self):
         if len(self.boolExprs) == 1:
-            return str(self.boolExprs[0])
-        return '( ' + ' '.join(map(str, self.boolEC)) + ' ) '
+            return self.prefix + str(self.boolExprs[0])
+        return self.prefix + '( ' + ' '.join(map(str, self.boolEC)) + ' ) '
 
 
 class AST_Having(AST_Node):
